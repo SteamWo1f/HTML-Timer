@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timers</title>
+    <style>
+
+        @font-face {
+            font-family: 'OpenDyslexic';
+            src: url('fonts/OpenDyslexic-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #f3f3f3;
+            font-family: 'OpenDyslexic', Arial, sans-serif;
+            transition: background-color 0.5s;
+        }
+
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            transition: background-color 0.3s;
+            font-size: 30px;
+        }
+
+        .timer:last-child {
+            border-bottom: none;
+        }
+
+        .name {
+            flex: 2;
+            font-size: 35px;
+
+        }
+
+        .time {
+            flex: 2;
+            font-size: 35px;
+        }
+
+        .milliseconds {
+            color: #707070; /* Change the color of milliseconds here */
+            font-size: 20px; /* Adjust the font size for milliseconds */
+            transition: color 0.3s;
+        }
+
+        .red {
+            background-color: #f44336;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .red .milliseconds {
+            color: #fff; /* Change the color of milliseconds when the background turns red */
+        }
+
+        .btn {
+            flex: 1;
+            padding: 6px 12px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            border: 2px solid #f3f3f3;
+        }
+
+        .btn.stop {
+            background-color: #f44336;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn.stop:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-clicked {
+            transform: scale(0.95);
+        }
+
+        .small-font {
+            font-size: 20px; /* Adjust the font size for milliseconds */
+        }
+    </style>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script>
+        // JavaScript code
+
+            // Clear cache when leaving the website
+            window.addEventListener('beforeunload', function () {
+                // Clear cache
+                if (window.caches && caches.keys) {
+                    caches.keys().then(function (names) {
+                        names.forEach(function (name) {
+                            caches.delete(name);
+                        });
+                    });
+                }
+            });
+
+        // Timer configuration
+        
+        var timers = []; // Array to store the loaded timers
+
+        function loadTimers() {
+            fetch('timers.json')
+                .then(response => response.json())
+                .then(data => {
+                    timers = data;
+                    createTimerElements();
+                })
+                .catch(error => console.error('Error loading timers:', error));
+        }
+
+        function createTimerElements() {
+            var container = document.querySelector('.container');
+
+            timers.forEach(timer => {
+                var timerElement = document.createElement('div');
+                timerElement.classList.add('timer');
+                timerElement.id = timer.id;
+
+                var nameElement = document.createElement('div');
+                nameElement.classList.add('name');
+                nameElement.textContent = timer.name;
+                timerElement.appendChild(nameElement);
+
+                var timeElement = document.createElement('div');
+                timeElement.classList.add('time');
+                timeElement.innerHTML = '0:0:0<span class="milliseconds">.000</span>';
+                timerElement.appendChild(timeElement);
+
+                var btnElement = document.createElement('div');
+                btnElement.classList.add('btn');
+                btnElement.textContent = 'Start';
+                btnElement.addEventListener('click', function () {
+                    startStopTimer(timer.id);
+                });
+                timerElement.appendChild(btnElement);
+
+                container.appendChild(timerElement);
+            });
+        }
+
+            function startStopTimer(timerId) {
+                var timerElement = document.getElementById(timerId);
+                var btnElement = timerElement.querySelector('.btn');
+                var timer = timerElement.querySelector('.time');
+                var milliseconds = timer.querySelector('.milliseconds');
+                var isRunning = timer.dataset.running === 'true';
+            
+                if (isRunning) {
+                    clearInterval(timer.intervalId);
+                    btnElement.innerHTML = 'Start';
+                    timer.dataset.running = 'false';
+                    timerElement.classList.remove('red');
+                    timer.innerHTML = '0:0:0<span class="milliseconds">.000</span>'; // Reset timer display
+            
+                    // Log stop event
+                    var timeNow = new Date().toLocaleTimeString();
+                    var logMessage = timerId + ' | Stop  | ' + timeNow;
+                    sendLogToServer(logMessage);
+                } else {
+                    var startTime = new Date().getTime();
+                    timer.intervalId = setInterval(function () {
+                        var currentTime = new Date().getTime();
+                        var elapsedTime = currentTime - startTime;
+                        var hours = Math.floor(elapsedTime / 3600000);
+                        var minutes = Math.floor((elapsedTime % 3600000) / 60000);
+                        var seconds = Math.floor((elapsedTime % 60000) / 1000);
+                        var millisecondsValue = elapsedTime % 1000;
+            
+                        var formattedTime = formatTime(hours, minutes, seconds, millisecondsValue);
+                        timer.innerHTML = formattedTime;
+            
+                        if (elapsedTime >= 3600000) {
+                            timerElement.classList.add('red');
+                            milliseconds.classList.add('red');
+                            addExclamationMarks(timer);
+                        } else {
+                            timerElement.classList.remove('red');
+                            milliseconds.classList.remove('red');
+                        }
+                    }, 10);
+            
+                    btnElement.innerHTML = 'Stop';
+                    timer.dataset.running = 'true';
+            
+                    // Log start event
+                    var timeNow = new Date().toLocaleTimeString();
+                    var logMessage = timerId + ' | Start | ' + timeNow;
+                    sendLogToServer(logMessage);
+                }
+            
+                btnElement.classList.toggle('stop'); // Toggle 'stop' class
+                btnElement.classList.add('btn-clicked'); // Add 'btn-clicked' class
+            
+                setTimeout(function () {
+                    btnElement.classList.remove('btn-clicked'); // Remove 'btn-clicked' class after a short delay
+                }, 300);
+            }
+            
+            function formatTime(hours, minutes, seconds, milliseconds) {
+                var formattedHours = padZero(hours);
+                var formattedMinutes = padZero(minutes);
+                var formattedSeconds = padZero(seconds);
+                var formattedMilliseconds = padZero(milliseconds, 3);
+                return formattedHours + ':' + formattedMinutes + ':' + formattedSeconds + '<span class="milliseconds">' + '.' + formattedMilliseconds + '</span>';
+            }
+    
+            function padZero(number, length) {
+                var zeros = '';
+                for (var i = 0; i < length; i++) {
+                    zeros += '0';
+                }
+                return (zeros + number).slice(-length);
+            }
+    
+            function addExclamationMarks(timer, elapsedTime) {
+                var timerText = timer.textContent;
+                if (elapsedTime >= 3600000) {
+                    timerText = '!! ' + timerText + ' !!';
+                    timer.innerHTML = timerText;
+                    var milliseconds = timer.querySelector('.milliseconds');
+                    milliseconds.classList.remove('small-font'); // Remove the 'small-font' class
+                }
+            }
+    
+            function sendLogToServer(log) {
+                // create an XMLHttpRequest
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "http://localhost:3000/log?message=" + encodeURIComponent(log), true);
+                xhr.send();
+            }
+    
+            // Automatically activate dark mode at 3:40 PM Mountain time
+            function checkDarkMode() {
+                var currentHour = new Date().getHours();
+                var currentMinute = new Date().getMinutes();
+                var currentTime = currentHour * 60 + currentMinute;
+                var darkModeTime = 15 * 60 + 40; // 3:40 PM Mountain time (15:40)
+    
+                if (currentTime >= darkModeTime) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+    
+            checkDarkMode();
+
+
+        </script>
+    </head>
+    <body onload="loadTimers()">
+        <div class="container">
+            <!-- Timer elements will be dynamically generated here -->
+        </div>
+    </body>
+    </html>
+    
