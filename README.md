@@ -5,12 +5,12 @@
 - The `http-server` package should be installed globally. If not installed, you can install it using NPM: `
   npm install -g http-server`
 
----
+
 ## **Getting Started**
 1. Clone the repository to your local machine or download the files.
    
 2. Open a terminal (command prompt) and navigate to the project directory.
----
+
 
 ## **Adding New Timers**
 To add new timers to the application, follow these steps:
@@ -29,7 +29,7 @@ To add new timers to the application, follow these steps:
 
 ### **! Note: Remember to clear you browsers cache in order to see the new timer !**
 
----
+
 ## **Starting the Server**
 You have two options to start the server:
 
@@ -59,10 +59,11 @@ You have two options to start the server:
 
 6. The Timer application will now be displayed in the Firefox browser window in kiosk mode.
 
----
+
 ## **Stopping the Server**
 To stop the server and close the web application, use the following steps:
 1. Press `Ctrl + C` in the terminal where the server was started. This will stop the `server.js` script.
 2. Close the Firefox browser window that was opened in kiosk mode.
+   Note: you can not click the close button in firefox kiosk mode
 
 **Note: The server can be started and accessed on the same machine where it is running. If you want to access the Timer application from another device on the same network, replace `localhost` in the URL with the server's IP address or hostname.**
