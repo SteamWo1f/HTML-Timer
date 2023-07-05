@@ -64,5 +64,6 @@ You have two options to start the server:
 To stop the server and close the web application, use the following steps:
 1. Press `Ctrl + C` in the terminal where the server was started. This will stop the `server.js` script.
 2. Close the Firefox browser window that was opened in kiosk mode.
+   Note: you can not click the close button in firefox kiosk mode
 
 **Note: The server can be started and accessed on the same machine where it is running. If you want to access the Timer application from another device on the same network, replace `localhost` in the URL with the server's IP address or hostname.**
