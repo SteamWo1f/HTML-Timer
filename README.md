@@ -2,8 +2,8 @@
 
 ## **Prerequisites**
 - Node.js and NPM should be installed on your system.
-- The `http-server` package should be installed globally. If not installed, you can install it using NPM: `
-  npm install -g http-server`
+- The `http-server` package should be installed globally. If not installed, you can install it using NPM: `npm install -g http-server`
+- The `cors` package should be installed globally. If not installed, you can install it using NPM: `npm install cors`
 
 
 ## **Getting Started**
@@ -52,9 +52,9 @@ You have two options to start the server:
 
 3. Once the server is running, open a new terminal window (or a new tab) without stopping the server.
 
-4. In the new terminal window, start the HTTP server to serve the `timer.html` file by running the following command: `http-server -p 8080`
+4. In the new terminal window, start the HTTP server to serve the `timer.html` file by running the following command: `http-server --cors --https -p 443`
 
-5. After starting the HTTP server, open a new Firefox browser window and enter the following URL in the address bar: http://localhost:8080/timer.html
+5. After starting the HTTP server, open a new Firefox browser window and enter the following URL in the address bar: `http://localhost:443/timer.html`
 
 
 6. The Timer application will now be displayed in the Firefox browser window in kiosk mode.

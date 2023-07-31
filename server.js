@@ -1,6 +1,11 @@
 const express = require('express');
 const fs = require('fs');
+const cors = require('cors'); // Import the 'cors' middleware
+
 const app = express();
+const port = 3000;
+
+app.use(cors()); // Enable CORS for all routes
 
 app.get('/log', (req, res) => {
     const message = req.query.message;
@@ -14,4 +19,6 @@ app.get('/log', (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log('Server listening on port 3000'));
+app.listen(port, function() {
+    console.log(`Server is running on http://localhost:${port}`);
+});
